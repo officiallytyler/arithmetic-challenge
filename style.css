@@ -1,6 +1,6 @@
 /* Tyler's Arithmetic Challenge - style.css (clean white and green theme) */
 :root {
-  --bg: #E5FFDA;            /* board colour - also used to "cut" the jigsaw notches */
+  --bg: #fff;            /* board colour - also used to "cut" the jigsaw notches */
   --ink: #14301f; --muted: #5b7263; --line: #d3e5d9;
   --green: #16a34a; --green-dark: #14532d; --red: #dc2626; --gap: 4px;
 }
