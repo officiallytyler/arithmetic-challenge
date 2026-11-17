@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tyler's Arithmetic Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+
+    <header class="top"><h1>Tyler's Arithmetic Challenge</h1></header>
+
+    <!-- Difficulty, countdown ring (click it to submit) and time limit -->
+    <section class="hud" aria-label="Game settings">
+      <div class="levels" id="difficultyGroup">
+        <button type="button" data-level="easy">Easy</button>
+        <button type="button" data-level="medium">Medium</button>
+        <button type="button" data-level="hard">Hard</button>
+      </div>
+      <button id="timerBtn" class="timer" type="button" title="Click to submit your answer">
+        <span id="timerText">30</span>
+        <small id="timerHint">seconds</small>
+      </button>
+      <label class="time">Time limit
+        <input id="timeSlider" type="range" min="5" max="45" step="5" value="30">
+        <output id="timeValue">30s</output>
+      </label>
+    </section>
+
+    <!-- The jigsaw board. script.js adds the 10 puzzle tiles before the answer tile. -->
+    <section class="board ready" id="board">
+      <div class="grid" id="grid">
+        <div class="tile answer" id="answerTile">
+          <span class="badge">Answer</span>
+          <input id="answerInput" type="text" inputmode="numeric" autocomplete="off" placeholder="?" disabled>
+          <button id="submitBtn" class="play" type="button" disabled>Submit</button>
+        </div>
+      </div>
+      <button id="startBtn" class="go" type="button">Start</button>
+    </section>
+
+    <footer class="foot">
+      <p id="roundStatus" class="status" role="status"></p>
+      <div class="actions">
+        <button id="newBtn" class="play" type="button">New challenge</button>
+        <button id="resetBtn" class="ghost" type="button">Reset</button>
+      </div>
+    </footer>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

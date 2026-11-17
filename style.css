@@ -1,0 +1,118 @@
+/* Tyler's Arithmetic Challenge - style.css (clean white and green theme) */
+:root {
+  --bg: #fff;            /* board colour - also used to "cut" the jigsaw notches */
+  --ink: #14301f; --muted: #5b7263; --line: #d3e5d9;
+  --green: #16a34a; --green-dark: #14532d; --red: #dc2626; --gap: 4px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; overflow: hidden; color: var(--ink); background: #f6faf7; font-family: Inter, "Segoe UI", system-ui, sans-serif; }
+
+/* The page is exactly one screen tall; the board stretches to fill what is left (no scrolling) */
+.app { height: 100dvh; max-width: 1100px; margin: 0 auto; padding: clamp(10px, 2vh, 22px) 20px; display: flex; flex-direction: column; gap: clamp(8px, 1.6vh, 16px); }
+h1 { margin: 0; padding-left: 12px; border-left: 6px solid var(--green); font-size: clamp(1.1rem, 2.8vh, 1.6rem); font-weight: 700; color: var(--green-dark); }
+
+/* ---------- Buttons ---------- */
+button { font: inherit; cursor: pointer; border: 0; color: inherit; transition: transform 0.15s, background 0.15s, box-shadow 0.15s; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.play { background: var(--green); color: #fff; font-weight: 600; padding: 0.6em 1.3em; border-radius: 10px; }
+.play:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); }
+.ghost { background: #fff; border: 1px solid var(--line); padding: 0.6em 1.2em; border-radius: 10px; font-weight: 600; }
+.ghost:hover { background: #f0f7f2; }
+
+.hud { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+.levels { display: flex; gap: 8px; }
+.levels button { --c: #16a34a; background: #fff; border: 2px solid var(--c); color: color-mix(in srgb, var(--c) 75%, #000); padding: 0.4em 1.2em; border-radius: 10px; font-weight: 600; }
+.levels button[data-level="medium"] { --c: #f59e0b; }
+.levels button[data-level="hard"] { --c: #dc2626; }
+.levels button:hover { transform: translateY(-2px); }
+.levels button.on { background: var(--c); color: #fff; }
+.levels button[data-level="medium"].on { color: #422006; }
+.time { justify-self: end; display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--muted); }
+.time input { width: 150px; accent-color: var(--green); }
+.time output { min-width: 3ch; font-weight: 700; color: var(--green-dark); }
+
+/* ---------- Timer ring (--p = % of time left, --c = colour; script.js updates both) ---------- */
+.timer {
+  --p: 100; --c: var(--green);
+  position: relative; width: 84px; height: 84px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: conic-gradient(var(--c) calc(var(--p) * 1%), #e4eee8 0);
+}
+.timer::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: #fff; }
+.timer span, .timer small { position: relative; }
+.timer span { font-size: 1.7rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.timer small { font-size: 0.55rem; font-weight: 600; color: var(--muted); }
+.timer:hover { transform: scale(1.05); }
+.timer.low span { color: var(--red); animation: beat 0.5s infinite alternate; }
+@keyframes beat { to { transform: scale(1.15); } }
+
+/* ---------- Board and jigsaw tiles ---------- */
+.board { position: relative; flex: 1; min-height: 0; display: flex; background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: clamp(10px, 1.8vh, 18px); transition: box-shadow 0.3s; }
+.board.correct { box-shadow: 0 0 0 4px var(--green); }
+.board.wrong { box-shadow: 0 0 0 4px var(--red); animation: wobble 0.4s; }
+@keyframes wobble { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.grid { flex: 1; min-width: 0; display: grid; gap: var(--gap); grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+
+/* JIGSAW TRICK: tiles with class r / b grow a round tab (::after / ::before); tiles with class l / t
+   have a round notch cut out (a radial-gradient in the board colour). script.js (layoutJigsaw) adds
+   those classes. The gap must stay 4px so each tab lands exactly in its neighbour's notch. */
+.tile {
+  --fill: #bbf7d0; --nl: linear-gradient(#0000, #0000); --nt: linear-gradient(#0000, #0000);
+  position: relative; z-index: var(--z, 1); min-height: 0; padding: clamp(6px, 1.2vh, 12px) 12px; border-radius: 14px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--nl), var(--nt), var(--fill);
+  animation: appear 0.4s ease-out both; animation-delay: calc(var(--i, 0) * 40ms);
+}
+.tile.l { --nl: radial-gradient(circle at 0 50%, var(--bg) 13px, #0000 14px); }
+.tile.t { --nt: radial-gradient(circle at 50% 0, var(--bg) 13px, #0000 14px); }
+.tile.r::after, .tile.b::before { content: ""; position: absolute; width: 22px; height: 22px; border-radius: 50%; background: var(--fill); }
+.tile.r::after { right: -15px; top: calc(50% - 11px); }
+.tile.b::before { bottom: -15px; left: calc(50% - 11px); }
+@keyframes appear { from { opacity: 0; transform: translateY(10px) scale(0.96); } }
+
+.badge { font-size: 0.75rem; font-weight: 600; opacity: 0.6; }
+.label { margin: auto 0; text-align: center; font-size: clamp(1.3rem, 4.4vh, 2.6rem); font-weight: 700; line-height: 1.1; }
+.tile.long .label { font-size: clamp(0.9rem, 2.6vh, 1.35rem); font-weight: 600; }
+.run { align-self: flex-end; min-height: 1em; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.4s; }
+.board.done .run { opacity: 0.6; }
+.tile.first { --fill: var(--green-dark); color: #fff; }          /* the starting number */
+.tile.first .label { font-size: clamp(1.8rem, 6vh, 3.4rem); }
+.frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.1; vertical-align: middle; margin-right: 0.4em; font-size: clamp(1.1rem, 3vh, 1.7rem); font-weight: 700; }
+.frac b:first-child { border-bottom: 2px solid currentColor; padding: 0 0.3em; }
+
+/* The answer piece */
+.tile.answer { grid-column: span 2; --fill: #e6f4ea; }
+.tile.answer.correct { --fill: #bbf7d0; }
+.tile.answer.wrong { --fill: #fee2e2; }
+.answer input {
+  width: 100%; background: none; border: 0; border-bottom: 3px solid var(--green-dark); outline: none; padding: 0;
+  color: var(--ink); -webkit-text-fill-color: var(--ink); font: 700 clamp(1.6rem, 5vh, 2.6rem) Inter, sans-serif; text-align: center;
+}
+.answer input::placeholder { color: #14301f40; -webkit-text-fill-color: #14301f40; }
+.answer input:disabled { opacity: 1; }
+.answer.wrong input { color: var(--red); -webkit-text-fill-color: var(--red); border-color: var(--red); }   /* the correct answer is shown in red */
+.answer .play { align-self: flex-end; padding: 0.35em 1em; }
+.shake { animation: wobble 0.35s; }
+
+/* Before Start the instructions are blurred but the jigsaw shapes stay visible */
+.board.ready .tile:not(.answer) > * { filter: blur(10px); }
+.go { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 50; background: var(--green); color: #fff; font-size: 1.5rem; font-weight: 700; padding: 0.6em 1.8em; border-radius: 12px; box-shadow: 0 0 0 8px #16a34a26, 0 10px 30px #14532d40; }
+.go:hover { background: #15803d; transform: scale(1.04); }
+.board:not(.ready) .go { display: none; }
+
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.status { flex: 1; margin: 0; min-height: 1.4em; font-weight: 600; }
+.status.ok { color: var(--green); }
+.status.bad { color: var(--red); }
+.actions { display: flex; gap: 10px; }
+
+/* ---------- Small screens: 2 columns ---------- */
+@media (max-width: 700px) {
+  .hud { grid-template-columns: 1fr; justify-items: center; gap: 8px; }
+  .time { justify-self: center; }
+  .grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); }
+  .label { font-size: clamp(1.1rem, 3.4vh, 1.8rem); }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
